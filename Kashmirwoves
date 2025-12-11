@@ -1,0 +1,95 @@
+import React, { useState } from "react"; import { Menu } from "lucide-react";
+
+export default function ShopPage() { const [sidebarOpen, setSidebarOpen] = useState(false); const [sortOption, setSortOption] = useState("");
+
+const products = [ { id: 1, name: "Winter Sweater", price: 1200, popularity: 90, date: "2025-01-01" }, { id: 2, name: "Wool Muffler", price: 600, popularity: 70, date: "2025-01-20" }, { id: 3, name: "Leather Gloves", price: 900, popularity: 80, date: "2025-02-10" }, { id: 4, name: "Down Jacket", price: 2500, popularity: 95, date: "2025-02-15" } ];
+
+const sortedProducts = [...products].sort((a, b) => { if (sortOption === "low-high") return a.price - b.price; if (sortOption === "high-low") return b.price - a.price; if (sortOption === "popularity") return b.popularity - a.popularity; if (sortOption === "newest") return new Date(b.date) - new Date(a.date); return 0; });
+
+// PRODUCT ADD FEATURE const [newProduct, setNewProduct] = useState({ name: "", price: "", img: null }); const [productList, setProductList] = useState([]);
+
+const addNewProduct = () => { if (!newProduct.name || !newProduct.price || !newProduct.img) return; const created = { id: Date.now(), name: newProduct.name, price: parseInt(newProduct.price), popularity: 0, date: new Date().toISOString(), img: URL.createObjectURL(newProduct.img) }; setProductList([...productList, created]); setNewProduct({ name: "", price: "", img: null }); };
+
+const sortedProducts = [...productList].sort((a, b) => { if (sortOption === "low-high") return a.price - b.price; if (sortOption === "high-low") return b.price - a.price; if (sortOption === "popularity") return b.popularity - a.popularity; if (sortOption === "newest") return new Date(b.date) - new Date(a.date); return 0; });
+
+return ( <div className="min-h-screen bg-white text-black font-sans"> {/* NAVBAR */} <div className="flex items-center p-4 border-b border-black"> <button onClick={() => setSidebarOpen(true)}> <Menu size={28} /> </button> <h1 className="mx-auto text-xl font-bold tracking-wide">KASHMIR WOVES</h1> </div>
+
+{/* SIDEBAR */}
+  {sidebarOpen && (
+    <div className="fixed inset-0 bg-black/50 z-20" onClick={() => setSidebarOpen(false)}>
+      <div className="w-64 bg-white h-full p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <h2 className="text-xl font-bold mb-4">Categories</h2>
+        <ul className="space-y-3 text-lg">
+          <li className="hover:underline cursor-pointer">Sweaters</li>
+          <li className="hover:underline cursor-pointer">Jackets</li>
+          <li className="hover:underline cursor-pointer">Mufflers</li>
+          <li className="hover:underline cursor-pointer">Gloves</li>
+        </ul>
+      </div>
+    </div>
+  )}
+
+  {/* SORT DROPDOWN */}
+  <div className="p-4 border-b border-black">
+    <label className="font-semibold mr-3">Sort By:</label>
+    <select 
+      className="border border-black p-1 bg-white"
+      value={sortOption}
+      onChange={(e) => setSortOption(e.target.value)}
+    >
+      <option value="">Default</option>
+      <option value="low-high">Price: Low to High</option>
+      <option value="high-low">Price: High to Low</option>
+      <option value="popularity">Popularity</option>
+      <option value="newest">Newest</option>
+    </select>
+  </div>
+
+  {{/* ADD PRODUCT PANEL (ADMIN ONLY) */}
+  <div className="p-4 border-b border-black">
+    <h2 className="font-bold text-lg mb-3">Add New Product (Admin Only)</h2>
+    <div className="flex flex-col gap-2 max-w-sm">
+      <input
+        type="text"
+        placeholder="Product Name"
+        className="border border-black p-2"
+        value={newProduct.name}
+        onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+      />
+      <input
+        type="number"
+        placeholder="Price"
+        className="border border-black p-2"
+        value={newProduct.price}
+        onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+      />
+      <input
+        type="file"
+        accept="image/*"
+        className="border border-black p-2"
+        onChange={(e) => setNewProduct({ ...newProduct, img: e.target.files[0] })}
+      />
+
+      <button
+        onClick={addNewProduct}
+        className="border border-black py-2 rounded-xl hover:bg-black hover:text-white transition"
+      >
+        Add Product
+      </button>
+    </div>
+  </div>
+
+  {/* PRODUCT GRID */}}
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4">
+    {sortedProducts.map((item) => (
+      <div key={item.id} className="border border-black p-3 rounded-xl shadow-sm hover:shadow-md transition shadow-black/20">
+        <div className="h-32 bg-black/10 mb-3"></div>
+        <h3 className="font-bold text-lg">{item.name}</h3>
+        <p className="text-sm">₹{item.price}</p>
+        <button className="mt-3 w-full border border-black py-1 rounded-xl hover:bg-black hover:text-white transition">Add to Cart</button>
+      </div>
+    ))}
+  </div>
+</div>
+
+); }
